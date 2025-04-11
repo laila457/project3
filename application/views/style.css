@@ -1,0 +1,239 @@
+/*dashboard*/
+body {
+  font-family: Arial, sans-serif;
+  background-color: #ffffff;
+  text-align: center;
+  margin: 0;
+  padding: 0;
+}
+.banner-container {
+  display: flex;
+  justify-content: center;
+  position: relative;
+}
+.banner-image {
+  width: 520px;
+  max-height: 250px; /* Sesuaikan tinggi gambar */
+}
+.banner-container::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #c86cc886; /* Warna hijau muda dengan transparansi 50% */
+}
+.login-button {
+  background-color: #ffffff; /* Warna latar belakang tombol */
+  color: #c86cc8; /* Warna teks tombol */
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-size: 16px;
+  position: absolute; /* Menggunakan posisi absolut */
+  right: 20px; /* Jarak dari kanan */
+  top: 15px; /* Jarak dari atas */
+}
+nav {
+  background-color: #c86cc8;
+  padding: 15px;
+}
+nav a {
+  color: white;
+  text-decoration: none;
+  margin: 0 90px;
+}
+.center-content {
+  text-align: center;
+  margin: 20px;
+}
+.container {
+  max-width: 1200px;
+  margin: 30px auto;
+  padding: 20px;
+  background-color: white;
+  border-radius: 5px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+}
+.container-pesanan {
+  max-width: 500px;
+  margin: 30px auto;
+  padding: 20px;
+  background-color: white;
+  border-radius: 5px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+}
+.cards {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+.card {
+  background-color: white;
+  padding: 15px;
+  justify-content: space-between; /* Membuat tombol selalu di bawah */
+  width: 30%;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.3s;
+}
+.card:hover {
+  transform: scale(1.05);
+}
+.card img {
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+  margin-bottom: 15px;
+}
+.booking-button {
+  background-color: #c86cc8; /* Warna latar belakang tombol */
+  color: #ffffff; /* Warna teks tombol */
+  border: none;
+  border-radius: 5px;
+  padding: 15px 20px;
+  cursor: pointer;
+  font-size: 16px;
+  display: inline-block; /* Pastikan elemen inline agar ukuran menyesuaikan */
+  text-align: center;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+/* Efek hover untuk tombol */
+.booking-button:hover {
+  background-color: #a04fa0;
+  transform: scale(1.05);
+}
+
+/* Efek klik untuk tombol */
+.booking-button:active {
+  transform: scale(0.98);
+}
+.card .spacer {
+  height: 90px; /* Sesuaikan dengan tinggi tombol */
+  visibility: hidden; /* Biar tidak terlihat */
+}
+.container-syarat {
+  text-align: left;
+  max-width: 1300px;
+  margin: 30px auto;
+  margin-top: 50px;
+  padding: 20px;
+  background-color: white;
+  border-radius: 5px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+}
+.container-syarat h3 {
+  margin-bottom: 15px;
+}
+.container-syarat p {
+  margin: 5px 0;
+  font-size: 16px;
+}
+.order-box {
+  background: #fff;
+  padding: 15px;
+  margin: 10px auto;
+  width: 80%;
+  border-radius: 10px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+.btn-order {
+  background: #c86cc8;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin: 25px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+}
+.btn-order:hover {
+  background-color: #a04fa0;
+  transform: scale(1.05);
+}
+
+/* Efek klik untuk tombol */
+.btn-order:active {
+  transform: scale(0.98);
+}
+.section-title {
+  position: relative;
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 20px;
+  display: inline-block;
+  text-transform: uppercase;
+  margin-top: 25px;
+}
+
+.section-title::after {
+  content: "";
+  display: block;
+  width: 50px; /* Panjang garis */
+  height: 4px; /* Ketebalan garis */
+  background-color: #c86cc8; /* Warna pink */
+  margin: 5px auto 0; /* Jarak garis dari teks */
+  border-radius: 2px; /* Membulatkan ujung garis */
+}
+
+/*booking*/
+.container-booking {
+  max-width: 800px;
+  text-align: left;
+  margin: auto;
+  margin-top: 40px;
+  padding: 20px;
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+.date-buttons button {
+  margin: 5px;
+  padding: 10px;
+  border: 1px solid black;
+  background: white;
+  cursor: pointer;
+}
+.btn-primary {
+  background-color: #c86cc8; /* Warna latar belakang tombol */
+  color: #ffffff; /* Warna teks tombol */
+  border: none;
+  border-radius: 5px;
+  padding: 10px 10px;
+  transition: background-color 0.3s, transform 0.2s;
+}
+.date-buttons button:hover,
+.selected-date {
+  background: black;
+  color: white;
+}
+.booking-button2 {
+  background-color: #c86cc8; /* Warna latar belakang tombol */
+  color: #ffffff; /* Warna teks tombol */
+  border: none;
+  border-radius: 5px;
+  padding: 15px 20px;
+  width: 100%;
+  cursor: pointer;
+  font-size: 16px;
+  display: inline-block; /* Pastikan elemen inline agar ukuran menyesuaikan */
+  text-align: center;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+footer {
+  margin-top: 50px;
+  text-align: center;
+  padding: 20px;
+  background-color: #c86cc8;
+  color: white;
+  bottom: 0;
+  width: 100%;
+}
