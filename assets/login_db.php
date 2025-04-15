@@ -1,15 +1,41 @@
 <?php
 session_start();
+require_once '../config/connection.php';
 header('Content-Type: application/json');
 
-$username = $_POST['username'];
-$password = $_POST['password'];
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $email = $_POST['email'];
+    $password = $_POST['password'];
 
-// Lakukan validasi login di sini
-if ($username === 'admin' && $password === 'password') { // Ganti dengan logika autentikasi yang sesuai
-    $_SESSION['user'] = $username; // Simpan informasi pengguna di sesi
-    echo json_encode(['status' => 'success', 'message' => 'Login berhasil!']);
+    if (empty($email) || empty($password)) {
+        echo json_encode(['status' => 'error', 'message' => 'All fields are required!']);
+        exit();
+    }
+
+    try {
+        $stmt = $conn->prepare("SELECT * FROM users WHERE email = ?");
+        $stmt->bind_param("s", $email);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($result->num_rows > 0) {
+            $user = $result->fetch_assoc();
+            if (password_verify($password, $user['password'])) {
+                $_SESSION['user_id'] = $user['id'];
+                $_SESSION['username'] = $user['username'];
+                $_SESSION['email'] = $user['email'];
+                echo json_encode(['status' => 'success', 'message' => 'Login successful!']);
+            } else {
+                echo json_encode(['status' => 'error', 'message' => 'Invalid password!']);
+            }
+        } else {
+            echo json_encode(['status' => 'error', 'message' => 'User not found!']);
+        }
+    } catch (Exception $e) {
+        error_log($e->getMessage());
+        echo json_encode(['status' => 'error', 'message' => 'Login failed. Please try again.']);
+    }
 } else {
-    echo json_encode(['status' => 'error', 'message' => 'Username atau password salah!']);
+    echo json_encode(['status' => 'error', 'message' => 'Invalid request method!']);
 }
 ?>

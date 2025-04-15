@@ -3,58 +3,128 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Happy Paws</title>
+    <title>Layanan - Happy Paws</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
     <link rel="stylesheet" href="style.css">
-
 </head>
 <body>
     <div class="banner-container">
-      <img src="./image/logooo.png" alt="Pet Banner" class="banner-image" />
+        <img src="./image/logooo.png" alt="Pet Banner" class="banner-image" />
+        <div class="login-wrapper">
+            <a href="login.php" class="btn btn-light login-button">
+                <i class="bi bi-person-circle"></i> Login
+            </a>
+        </div>
     </div>
     <nav>
-        <a href="index.php">Beranda</a>
-        <a href="layanan.php">Layanan</a>
-        <a href="booking.php">Booking</a>
-        <a href="akun.php">Akun</a>
+        <a href="index.php"><i class="bi bi-house-door"></i> Beranda</a>
+        <a href="layanan.php" class="active"><i class="bi bi-grid"></i> Layanan</a>
+        <a href="booking.php"><i class="bi bi-calendar-check"></i> Booking</a>
+        <a href="akun.php"><i class="bi bi-person"></i> Akun</a>
     </nav>
-    <button class="login-button" onclick="window.location.href='login.php'">
-      Login
-    </button>
-    <div class="center-content">
-      <a href="layanan.php" class="section-title">Layanan</a>
+
+    <div class="container mt-5">
+        <div class="text-center mb-5">
+            <h2 class="display-4 mb-3">Layanan Kami</h2>
+            <p class="lead">Pilih layanan terbaik untuk hewan kesayangan Anda</p>
+        </div>
+
+        <div class="row g-4 mb-5">
+            <div class="col-md-4">
+                <div class="service-card">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <img src="./image/grooming.png" alt="Grooming" class="card-img-top p-3">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Grooming</h5>
+                            <p class="card-text text-muted mb-3">Mulai dari Rp 60.000</p>
+                            <a href="booking.php" class="btn btn-primary">
+                                <i class="bi bi-calendar-plus"></i> Book Now
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="service-card">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <img src="./image/penitipan.png" alt="Penitipan" class="card-img-top p-3">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Penitipan</h5>
+                            <p class="card-text text-muted mb-3">Mulai dari Rp 50.000/hari</p>
+                            <a href="booking.php" class="btn btn-primary">
+                                <i class="bi bi-calendar-plus"></i> Book Now
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="service-card">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <img src="./image/antar.png" alt="Antar Jemput" class="card-img-top p-3">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Antar Jemput</h5>
+                            <p class="card-text text-muted mb-3">Tersedia untuk area tertentu</p>
+                            <a href="booking.php" class="btn btn-primary">
+                                <i class="bi bi-calendar-plus"></i> Book Now
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm mb-5">
+            <div class="card-body p-4">
+                <h3 class="card-title mb-4"><i class="bi bi-info-circle"></i> Syarat dan Ketentuan</h3>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-start mb-3">
+                            <i class="bi bi-check-circle-fill text-primary me-2 mt-1"></i>
+                            <p class="mb-0">Hewan harus dalam kondisi sehat dan tidak agresif</p>
+                        </div>
+                        <div class="d-flex align-items-start mb-3">
+                            <i class="bi bi-check-circle-fill text-primary me-2 mt-1"></i>
+                            <p class="mb-0">Tidak menerima hewan dengan penyakit menular</p>
+                        </div>
+                        <div class="d-flex align-items-start mb-3">
+                            <i class="bi bi-check-circle-fill text-primary me-2 mt-1"></i>
+                            <p class="mb-0">Jika hewan sulit dikendalikan, biaya tambahan dapat dikenakan</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-start mb-3">
+                            <i class="bi bi-check-circle-fill text-primary me-2 mt-1"></i>
+                            <p class="mb-0">Pembatalan kurang dari 24 jam sebelum jadwal tidak bisa refund</p>
+                        </div>
+                        <div class="d-flex align-items-start mb-3">
+                            <i class="bi bi-check-circle-fill text-primary me-2 mt-1"></i>
+                            <p class="mb-0">Untuk layanan penitipan, hewan wajib sudah divaksin</p>
+                        </div>
+                        <div class="d-flex align-items-start mb-3">
+                            <i class="bi bi-check-circle-fill text-primary me-2 mt-1"></i>
+                            <p class="mb-0">Layanan antar jemput hanya tersedia di area tertentu</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center mb-5">
+            <a href="booking.php" class="btn btn-primary btn-lg">
+                <i class="bi bi-calendar-plus"></i> Pesan Sekarang
+            </a>
+        </div>
     </div>
-    <div class="cards">
-      <div class="card">
-            <img src="./image/grooming.png" alt="Grooming">
-            <h5>Grooming</h5>
-            <p>Mulai dari 60.000</p>
-            <a href="booking.php" class="booking-button">Book Now</a>
-      </div>
-      <div class="card">
-            <img src="./image/penitipan.png" alt="Penitipan">
-            <h5>Penitipan</h5>
-            <p>Mulai dari 50.000/hari</p>
-            <button class="booking-button" onclick="window.location.href='booking.php'">Booking Now</button>
-      </div>
-      <div class="card">
-            <img src="./image/antar.png" alt="Antar Jemput">
-            <h5>Antar Jemput</h5>
-            <div class="spacer"></div>
-      </div>
-    </div>
-    <div class="container-syarat">
-      <h3>Syarat dan Ketentuan</h3>
-      <p>🔹 Hewan harus dalam kondisi sehat dan tidak agresif.</p>
-      <p>🔹 Tidak menerima hewan dengan penyakit menular.</p>
-      <p>🔹 Jika hewan sulit dikendalikan, biaya tambahan dapat dikenakan.</p>
-      <p>🔹 Pembatalan kurang dari 24 jam sebelum jadwal tidak bisa refund.</p>
-      <p>🔹 Untuk layanan penitipan, hewan wajib sudah divaksin.</p>
-      <p>🔹 Layanan antar jemput hanya tersedia di area tertentu dan sesuai jadwal yang disepakati.</p>
-    </div>
-    <button class="btn-order">Pesan Sekarang</button>
-    <footer>
-      <p>&copy; 2025 HappyPaws Indo. All Rights Reserved.</p>
+
+    <footer class="mt-5">
+        <div class="container">
+            <p class="m-0">&copy; 2025 HappyPaws Indo. All Rights Reserved.</p>
+        </div>
     </footer>
-  </body>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
 </html>

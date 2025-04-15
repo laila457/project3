@@ -1,30 +1,51 @@
 <?php
-session_start();
-require_once '../config/connection.php';
+require_once 'config.php';
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $booking_date = $_POST['booking_date'];
     $booking_time = $_POST['booking_time'];
     $owner_name = $_POST['owner_name'];
     $phone = $_POST['phone'];
     $pet_type = $_POST['pet_type'];
     $package = $_POST['package'];
-    // Remove total_pets variable and from the query
-    $query = "INSERT INTO bookings (booking_date, booking_time, owner_name, phone, pet_type, package, 
-              delivery_method, address, kecamatan, desa) 
-              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    $delivery_method = $_POST['delivery_method'];
     
-    $stmt = $conn->prepare($query);
-    $stmt->bind_param("sssssssssss", $booking_date, $booking_time, $owner_name, $phone, $pet_type, $total_pets, 
-                      $package, $delivery_method, $full_address, $kecamatan, $desa);
+    // Initialize address fields
+    $kecamatan = $desa = $address = null;
     
-    if ($stmt->execute()) {
-        $booking_id = $conn->insert_id;
-        header("Location: payment.php?booking_id=" . $booking_id);
-    } else {
-        $_SESSION['error'] = "Gagal membuat booking.";
-        header("Location: booking.php");
+    // If delivery method is antar_jemput, get address details
+    if ($delivery_method === 'antar_jemput') {
+        $kecamatan = $_POST['kecamatan'];
+        $desa = $_POST['desa'];
+        $address = $_POST['detail_alamat'];
     }
-    exit();
+
+    $sql = "INSERT INTO bookings (booking_date, booking_time, owner_name, phone, pet_type, package, delivery_method, kecamatan, desa, address) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param(
+        'ssssssssss',
+        $booking_date,
+        $booking_time,
+        $owner_name,
+        $phone,
+        $pet_type,
+        $package,
+        $delivery_method,
+        $kecamatan,
+        $desa,
+        $address
+    );
+
+    if ($stmt->execute()) {
+        $booking_id = $stmt->insert_id;
+        header("Location: payment.php?booking_id=" . $booking_id);
+        exit();
+    } else {
+        echo "Error: " . $stmt->error;
+    }
+
+    $stmt->close();
+    $conn->close();
 }
 ?>

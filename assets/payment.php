@@ -1,6 +1,5 @@
 <?php
-session_start();
-require_once '../config/connection.php';
+require_once 'config.php';
 
 if (!isset($_GET['booking_id'])) {
     header("Location: booking.php");
@@ -8,28 +7,28 @@ if (!isset($_GET['booking_id'])) {
 }
 
 $booking_id = $_GET['booking_id'];
-$query = "SELECT b.* 
-          FROM bookings b 
-          WHERE b.id = ? AND NOT EXISTS (
-              SELECT 1 FROM payments p WHERE p.booking_id = b.id
-          )";
 
-$stmt = $conn->prepare($query);
+// Fetch booking details
+$stmt = $conn->prepare("SELECT * FROM bookings WHERE id = ?");
 $stmt->bind_param("i", $booking_id);
 $stmt->execute();
 $result = $stmt->get_result();
 $booking = $result->fetch_assoc();
 
-// Redirect if booking not found or already paid
 if (!$booking) {
-    $_SESSION['error'] = "Booking tidak ditemukan atau sudah dibayar.";
-    header("Location: riwayat.php");
+    header("Location: booking.php");
     exit();
 }
 
-// Extract price from package string
-preg_match('/(\d+)k/', $booking['package'], $matches);
-$price = isset($matches[1]) ? $matches[1] * 1000 : 0;
+// Calculate total payment
+$base_price = str_replace(['Basic - ', 'Kutu - Jamur - ', 'Full - ', 'k'], '', $booking['package']);
+$delivery_cost = ($booking['delivery_method'] === 'antar_jemput') ? 20 : 0;
+$total_price = ($base_price + $delivery_cost) * 1000;
+
+// Update the total price in database
+$update_stmt = $conn->prepare("UPDATE bookings SET total_payment = ? WHERE id = ?");
+$update_stmt->bind_param("di", $total_price, $booking_id);
+$update_stmt->execute();
 ?>
 
 <!DOCTYPE html>
@@ -37,54 +36,121 @@ $price = isset($matches[1]) ? $matches[1] * 1000 : 0;
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pembayaran</title>
+    <title>Payment - Happy Paws</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="banner-container">
         <img src="./image/logooo.png" alt="Pet Banner" class="banner-image" />
+        <div class="login-wrapper">
+            <a href="login.php" class="btn btn-light login-button">
+                <i class="bi bi-person-circle"></i> Login
+            </a>
+        </div>
     </div>
     <nav>
-        <a href="index.php">Beranda</a>
-        <a href="layanan.php">Layanan</a>
-        <a href="booking.php">Booking</a>
-        <a href="riwayat.php">Riwayat</a>
-        <a href="akun.php">Akun</a>
+        <a href="index.php"><i class="bi bi-house-door"></i> Beranda</a>
+        <a href="layanan.php"><i class="bi bi-grid"></i> Layanan</a>
+        <a href="booking.php"><i class="bi bi-calendar-check"></i> Booking</a>
+        <a href="akun.php"><i class="bi bi-person"></i> Akun</a>
     </nav>
 
     <div class="container mt-5">
-        <div class="card">
-            <div class="card-body">
-                <h2 class="text-center mb-4">Detail Pembayaran</h2>
-                <div class="row">
-                    <div class="col-md-12">
-                        <h5>Detail Booking</h5>
-                        <p>Paket: <?= htmlspecialchars($booking['package']) ?></p>
-                        <p>Tanggal: <?= date('d/m/Y', strtotime($booking['booking_date'])) ?></p>
-                        <p>Jam: <?= $booking['booking_time'] ?></p>
-                        <p>Total: Rp <?= number_format($price, 0, ',', '.') ?></p>
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-5">
+                        <h2 class="text-center mb-4">Pembayaran Otomatis</h2>
+                        
+                        <div class="booking-details mb-4">
+                            <h5>Detail Pesanan:</h5>
+                            <p><strong>Paket:</strong> <?php echo htmlspecialchars($booking['package']); ?></p>
+                            <p><strong>Tanggal:</strong> <?php echo htmlspecialchars($booking['booking_date']); ?></p>
+                            <p><strong>Waktu:</strong> <?php echo htmlspecialchars($booking['booking_time']); ?></p>
+                            <?php if ($booking['delivery_method'] === 'antar_jemput'): ?>
+                                <p><strong>Biaya Antar Jemput:</strong> Rp 20.000</p>
+                            <?php endif; ?>
+                            <p><strong>Total Pembayaran:</strong> Rp <?php echo number_format($total_price, 0, ',', '.'); ?></p>
+                        </div>
 
-                        <form action="process_payment.php" method="POST">
-                            <input type="hidden" name="booking_id" value="<?= $booking_id ?>">
-                            <input type="hidden" name="amount" value="<?= $price ?>">
-                            
-                            <div class="form-group">
-                                <label>Metode Pembayaran</label>
-                                <select class="form-control" name="payment_method" required>
-                                    <option value="cash">Cash</option>
-                                    <option value="transfer">Transfer Bank</option>
-                                    <option value="ewallet">E-Wallet</option>
-                                </select>
-                            </div>
+                        <div class="payment-methods">
+                            <h5 class="mb-3">Pilih Metode Pembayaran:</h5>
+                            <form action="process_payment.php" method="POST">
+                                <input type="hidden" name="booking_id" value="<?php echo $booking_id; ?>">
+                                <input type="hidden" name="total_amount" value="<?php echo $total_price; ?>">
+                                
+                                <div class="mb-3">
+                                    <select class="form-select" name="payment_method" required>
+                                        <option value="">Pilih metode pembayaran</option>
+                                        <option value="BCA">Transfer Bank BCA</option>
+                                        <option value="Mandiri">Transfer Bank Mandiri</option>
+                                        <option value="DANA">DANA</option>
+                                    </select>
+                                </div>
 
-                            <button type="submit" class="btn btn-primary mt-3">Proses Pembayaran</button>
-                            <a href="riwayat.php" class="btn btn-secondary mt-3">Kembali</a>
-                        </form>
+                                <div class="text-center mt-4">
+                                    <button type="submit" class="btn btn-primary btn-lg">
+                                        <i class="bi bi-credit-card"></i> Bayar Sekarang
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <footer class="mt-5">
+        <div class="container">
+            <p class="m-0">&copy; 2025 HappyPaws Indo. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+    function showPaymentDetails(method) {
+        const detailsDiv = document.getElementById('paymentDetails');
+        const instructionsDiv = document.getElementById('paymentInstructions');
+        let instructions = '';
+
+        switch(method) {
+            case 'BCA':
+                instructions = `
+                    <p>Nomor Rekening: 1234567890</p>
+                    <p>Atas Nama: Happy Paws</p>
+                    <p>1. Transfer sesuai nominal yang tertera</p>
+                    <p>2. Simpan bukti pembayaran</p>
+                    <p>3. Kirim bukti pembayaran ke WhatsApp 081234567890</p>
+                `;
+                break;
+            case 'Mandiri':
+                instructions = `
+                    <p>Nomor Rekening: 0987654321</p>
+                    <p>Atas Nama: Happy Paws</p>
+                    <p>1. Transfer sesuai nominal yang tertera</p>
+                    <p>2. Simpan bukti pembayaran</p>
+                    <p>3. Kirim bukti pembayaran ke WhatsApp 081234567890</p>
+                `;
+                break;
+            case 'DANA':
+                instructions = `
+                    <p>Nomor DANA: 081234567890</p>
+                    <p>Atas Nama: Happy Paws</p>
+                    <p>1. Buka aplikasi DANA</p>
+                    <p>2. Pilih "Kirim"</p>
+                    <p>3. Masukkan nomor tujuan</p>
+                    <p>4. Transfer sesuai nominal</p>
+                    <p>5. Kirim bukti pembayaran ke WhatsApp 081234567890</p>
+                `;
+                break;
+        }
+
+        instructionsDiv.innerHTML = instructions;
+        detailsDiv.style.display = 'block';
+    }
+    </script>
 </body>
 </html>

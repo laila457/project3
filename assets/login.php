@@ -95,20 +95,21 @@
 
     <!-- Register Form -->
     <div class="auth-container" id="registerForm" style="display: none">
+      <img src="./image/logooo.png" alt="Login Image" class="login-image" />
       <h2 class="text-center mb-4">Register</h2>
       <form onsubmit="handleRegister(event)">
         <div class="mb-3">
-        <label for="registerUsername" class="form-label">Username</label>
-        <input type="text" class="form-control" id="registerUsername" placeholder="Username" required>
-      </div>
-      <div class="mb-3">
-        <label for="registerEmail" class="form-label">Email address</label>
-        <input type="email" class="form-control" id="registerEmail" placeholder="Email" required>
-      </div>
-      <div class="mb-3">
-        <label for="registerPassword" class="form-label">Password</label>
-        <input type="password" class="form-control" id="registerPassword" placeholder="Password" required>
-      </div>
+          <label for="registerUsername" class="form-label">Username</label>
+          <input type="text" class="form-control" id="registerUsername" placeholder="Username" required>
+        </div>
+        <div class="mb-3">
+          <label for="registerEmail" class="form-label">Email address</label>
+          <input type="email" class="form-control" id="registerEmail" placeholder="Email" required>
+        </div>
+        <div class="mb-3">
+          <label for="registerPassword" class="form-label">Password</label>
+          <input type="password" class="form-control" id="registerPassword" placeholder="Password" required>
+        </div>
         <button type="submit" class="btn btn-purple w-100">Register</button>
         <p class="text-center mt-3">
           Already have an account?
@@ -116,10 +117,78 @@
         </p>
       </form>
     </div>
+
     <!-- Bootstrap JS and Popper.js -->
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"></script>
-    <!-- Custom JavaScript -->
-    <script src="./script.js"></script>
+    
+    <script>
+    function toggleForm() {
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+        
+        if (loginForm.style.display === 'none') {
+            loginForm.style.display = 'block';
+            registerForm.style.display = 'none';
+        } else {
+            loginForm.style.display = 'none';
+            registerForm.style.display = 'block';
+        }
+    }
+
+    function handleRegister(event) {
+        event.preventDefault();
+        const username = document.getElementById('registerUsername').value;
+        const email = document.getElementById('registerEmail').value;
+        const password = document.getElementById('registerPassword').value;
+
+        fetch('process_register.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `username=${encodeURIComponent(username)}&email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                alert('Registration successful! Please login.');
+                toggleForm();
+            } else {
+                alert(data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred during registration.');
+        });
+    }
+
+    function handleLogin(event) {
+        event.preventDefault();
+        const email = document.getElementById('loginEmail').value;
+        const password = document.getElementById('loginPassword').value;
+
+        fetch('process_login.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                window.location.href = 'index.php';
+            } else {
+                alert(data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred during login.');
+        });
+    }
+    </script>
   </body>
 </html>
