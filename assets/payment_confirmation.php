@@ -45,7 +45,8 @@ if (!$booking) {
     <nav>
         <a href="index.php"><i class="bi bi-house-door"></i> Beranda</a>
         <a href="layanan.php"><i class="bi bi-grid"></i> Layanan</a>
-        <a href="booking.php"><i class="bi bi-calendar-check"></i> Booking</a>
+        <a href="booking.php"><i class="bi bi-calendar-check"></i> Grooming</a>
+        <a href="boarding.php"><i class="bi bi-house"></i> Penitipan</a>
         <a href="akun.php"><i class="bi bi-person"></i> Akun</a>
     </nav>
 

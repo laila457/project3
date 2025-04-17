@@ -54,7 +54,8 @@ $update_stmt->execute();
     <nav>
         <a href="index.php"><i class="bi bi-house-door"></i> Beranda</a>
         <a href="layanan.php"><i class="bi bi-grid"></i> Layanan</a>
-        <a href="booking.php"><i class="bi bi-calendar-check"></i> Booking</a>
+        <a href="booking.php"><i class="bi bi-calendar-check"></i> Grooming</a>
+        <a href="boarding.php"><i class="bi bi-house"></i> Penitipan</a>
         <a href="akun.php"><i class="bi bi-person"></i> Akun</a>
     </nav>
 
@@ -78,22 +79,42 @@ $update_stmt->execute();
 
                         <div class="payment-methods">
                             <h5 class="mb-3">Pilih Metode Pembayaran:</h5>
-                            <form action="process_payment.php" method="POST">
+                            <form id="paymentForm" action="process_payment.php" method="POST">
                                 <input type="hidden" name="booking_id" value="<?php echo $booking_id; ?>">
                                 <input type="hidden" name="total_amount" value="<?php echo $total_price; ?>">
                                 
                                 <div class="mb-3">
-                                    <select class="form-select" name="payment_method" required>
+                                    <select class="form-select" name="payment_method" id="paymentMethod" onchange="showPaymentDetails(this.value)" required>
                                         <option value="">Pilih metode pembayaran</option>
+                                        <option value="QRIS">QRIS</option>
                                         <option value="BCA">Transfer Bank BCA</option>
                                         <option value="Mandiri">Transfer Bank Mandiri</option>
-                                        <option value="DANA">DANA</option>
                                     </select>
+                                </div>
+
+                                <div id="paymentDetails" class="mt-4" style="display: none;">
+                                    <div class="text-center mb-4">
+                                        <div id="qrisCode" style="display: none;">
+                                            <img src="./image/qris.png" alt="QRIS Code" style="max-width: 200px;" class="mb-3">
+                                            <p class="text-muted">Scan QRIS code di atas menggunakan aplikasi e-wallet Anda</p>
+                                        </div>
+                                        <div id="bankDetails" style="display: none;">
+                                            <div class="alert alert-info">
+                                                <h6 class="bank-name mb-2"></h6>
+                                                <p class="account-number mb-1"></p>
+                                                <p class="account-name mb-0">A.n Happy Paws</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="alert alert-warning">
+                                        <h6>Langkah Pembayaran:</h6>
+                                        <ol id="paymentInstructions" class="mb-0"></ol>
+                                    </div>
                                 </div>
 
                                 <div class="text-center mt-4">
                                     <button type="submit" class="btn btn-primary btn-lg">
-                                        <i class="bi bi-credit-card"></i> Bayar Sekarang
+                                        <i class="bi bi-credit-card"></i> Konfirmasi Pembayaran
                                     </button>
                                 </div>
                             </form>
@@ -113,43 +134,43 @@ $update_stmt->execute();
     <script>
     function showPaymentDetails(method) {
         const detailsDiv = document.getElementById('paymentDetails');
+        const qrisDiv = document.getElementById('qrisCode');
+        const bankDiv = document.getElementById('bankDetails');
         const instructionsDiv = document.getElementById('paymentInstructions');
-        let instructions = '';
-
-        switch(method) {
-            case 'BCA':
-                instructions = `
-                    <p>Nomor Rekening: 1234567890</p>
-                    <p>Atas Nama: Happy Paws</p>
-                    <p>1. Transfer sesuai nominal yang tertera</p>
-                    <p>2. Simpan bukti pembayaran</p>
-                    <p>3. Kirim bukti pembayaran ke WhatsApp 081234567890</p>
-                `;
-                break;
-            case 'Mandiri':
-                instructions = `
-                    <p>Nomor Rekening: 0987654321</p>
-                    <p>Atas Nama: Happy Paws</p>
-                    <p>1. Transfer sesuai nominal yang tertera</p>
-                    <p>2. Simpan bukti pembayaran</p>
-                    <p>3. Kirim bukti pembayaran ke WhatsApp 081234567890</p>
-                `;
-                break;
-            case 'DANA':
-                instructions = `
-                    <p>Nomor DANA: 081234567890</p>
-                    <p>Atas Nama: Happy Paws</p>
-                    <p>1. Buka aplikasi DANA</p>
-                    <p>2. Pilih "Kirim"</p>
-                    <p>3. Masukkan nomor tujuan</p>
-                    <p>4. Transfer sesuai nominal</p>
-                    <p>5. Kirim bukti pembayaran ke WhatsApp 081234567890</p>
-                `;
-                break;
-        }
-
-        instructionsDiv.innerHTML = instructions;
+        const bankName = bankDiv.querySelector('.bank-name');
+        const accountNumber = bankDiv.querySelector('.account-number');
+        
         detailsDiv.style.display = 'block';
+        
+        if (method === 'QRIS') {
+            qrisDiv.style.display = 'block';
+            bankDiv.style.display = 'none';
+            instructionsDiv.innerHTML = `
+                <li>Scan QRIS code menggunakan aplikasi e-wallet Anda</li>
+                <li>Masukkan nominal pembayaran: Rp ${new Intl.NumberFormat('id-ID').format(<?php echo $total_price; ?>)}</li>
+                <li>Periksa kembali detail pembayaran</li>
+                <li>Selesaikan pembayaran</li>
+                <li>Simpan bukti pembayaran</li>
+            `;
+        } else {
+            qrisDiv.style.display = 'none';
+            bankDiv.style.display = 'block';
+            
+            if (method === 'BCA') {
+                bankName.textContent = 'Bank BCA';
+                accountNumber.textContent = 'No. Rekening: 1234567890';
+            } else if (method === 'Mandiri') {
+                bankName.textContent = 'Bank Mandiri';
+                accountNumber.textContent = 'No. Rekening: 0987654321';
+            }
+            
+            instructionsDiv.innerHTML = `
+                <li>Transfer ke rekening yang tertera di atas</li>
+                <li>Masukkan nominal: Rp ${new Intl.NumberFormat('id-ID').format(<?php echo $total_price; ?>)}</li>
+                <li>Pastikan nama penerima adalah Happy Paws</li>
+                <li>Simpan bukti transfer</li>
+            `;
+        }
     }
     </script>
 </body>

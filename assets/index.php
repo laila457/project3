@@ -2,7 +2,7 @@
 session_start();
 require_once '../config/connection.php';
 
-// Get booking history
+// Get booking history only for logged-in user
 $query = "SELECT b.*, 
           CASE 
             WHEN p.id IS NOT NULL THEN 'Sudah Dibayar'
@@ -10,9 +10,14 @@ $query = "SELECT b.*,
           END as payment_status
           FROM bookings b 
           LEFT JOIN payments p ON b.id = p.booking_id 
+          WHERE b.owner_name = ?
           ORDER BY b.booking_date DESC";
 
-$result = $conn->query($query);
+$stmt = $conn->prepare($query);
+$stmt->bind_param("s", $_SESSION['username']); // Changed to use username
+$stmt->execute();
+$result = $stmt->get_result();
+
 ?>
 
 <!DOCTYPE html>
@@ -42,9 +47,10 @@ $result = $conn->query($query);
         </div>
     </div>
     <nav>
-        <a href="index.php" class="active"><i class="bi bi-house-door"></i> Beranda</a>
+        <a href="index.php"><i class="bi bi-house-door"></i> Beranda</a>
         <a href="layanan.php"><i class="bi bi-grid"></i> Layanan</a>
-        <a href="booking.php"><i class="bi bi-calendar-check"></i> Booking</a>
+        <a href="booking.php"><i class="bi bi-calendar-check"></i> Grooming</a>
+        <a href="boarding.php"><i class="bi bi-house"></i> Penitipan</a>
         <a href="akun.php"><i class="bi bi-person"></i> Akun</a>
     </nav>
 

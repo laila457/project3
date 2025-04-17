@@ -1,3 +1,6 @@
+<?php
+session_start();
+?>
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -13,15 +16,22 @@
     <div class="banner-container">
         <img src="./image/logooo.png" alt="Pet Banner" class="banner-image" />
         <div class="login-wrapper">
-            <a href="login.php" class="btn btn-light login-button">
-                <i class="bi bi-person-circle"></i> Login
-            </a>
+            <?php if(isset($_SESSION['user_id'])): ?>
+                <a href="logout.php" class="btn btn-light login-button">
+                    <i class="bi bi-box-arrow-right"></i> Logout
+                </a>
+            <?php else: ?>
+                <a href="login.php" class="btn btn-light login-button">
+                    <i class="bi bi-person-circle"></i> Login
+                </a>
+            <?php endif; ?>
         </div>
     </div>
     <nav>
         <a href="index.php"><i class="bi bi-house-door"></i> Beranda</a>
-        <a href="layanan.php" class="active"><i class="bi bi-grid"></i> Layanan</a>
-        <a href="booking.php"><i class="bi bi-calendar-check"></i> Booking</a>
+        <a href="layanan.php"><i class="bi bi-grid"></i> Layanan</a>
+        <a href="booking.php"><i class="bi bi-calendar-check"></i> Grooming</a>
+        <a href="boarding.php"><i class="bi bi-house"></i> Penitipan</a>
         <a href="akun.php"><i class="bi bi-person"></i> Akun</a>
     </nav>
 
@@ -53,7 +63,7 @@
                         <div class="card-body text-center">
                             <h5 class="card-title">Penitipan</h5>
                             <p class="card-text text-muted mb-3">Mulai dari Rp 50.000/hari</p>
-                            <a href="booking.php" class="btn btn-primary">
+                            <a href="boarding.php" class="btn btn-primary">
                                 <i class="bi bi-calendar-plus"></i> Book Now
                             </a>
                         </div>
@@ -114,7 +124,10 @@
 
         <div class="text-center mb-5">
             <a href="booking.php" class="btn btn-primary btn-lg">
-                <i class="bi bi-calendar-plus"></i> Pesan Sekarang
+                <i class="bi bi-calendar-plus"></i> Pesan Grooming
+            </a>
+            <a href="boarding.php" class="btn btn-primary btn-lg ms-2">
+                <i class="bi bi-calendar-plus"></i> Pesan Penitipan
             </a>
         </div>
     </div>

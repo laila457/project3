@@ -1,17 +1,16 @@
 <?php
 session_start();
 if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php?redirect=booking.php");
+    header("Location: login.php?redirect=boarding.php");
     exit();
 }
 ?>
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Booking - Happy Paws</title>
+    <title>Pet Boarding - Happy Paws</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
@@ -46,42 +45,25 @@ if (!isset($_SESSION['user_id'])) {
             <div class="col-md-8">
                 <div class="card border-0 shadow-sm">
                     <div class="card-body p-4">
-                        <h2 class="text-center mb-4">Reservasi Grooming</h2>
-                        
-                        <!-- Add this in the head section -->
-                        <script src="js/booking.js" defer></script>
-                        
-                        <!-- Replace the monthSelector section with this -->
-                        <div class="booking-section mb-4">
-                            <h5 class="mb-3"><i class="bi bi-calendar3"></i> Pilih Jadwal</h5>
-                            <select id="monthSelector" class="form-select mb-3" onchange="changeMonth()">
-                                <option value="1">Januari</option>
-                                <option value="2">Februari</option>
-                                <option value="3">Maret</option>
-                                <option value="4">April</option>
-                                <option value="5">Mei</option>
-                                <option value="6">Juni</option>
-                                <option value="7">Juli</option>
-                                <option value="8">Agustus</option>
-                                <option value="9">September</option>
-                                <option value="10">Oktober</option>
-                                <option value="11">November</option>
-                                <option value="12">Desember</option>
-                            </select>
-                        
-                            <div id="dateButtons" class="d-flex flex-wrap gap-2 mb-3"></div>
-                        </div>
+                        <h2 class="text-center mb-4">Reservasi Penitipan Hewan</h2>
 
-                        <form id="bookingForm" action="process_booking.php" method="POST" onsubmit="return validateBooking()">
-                            <input type="hidden" id="booking_date" name="booking_date">
-
-                            <div class="mb-4">
-                                <label for="booking_time" class="form-label">Waktu Booking</label>
-                                <input type="time" id="booking_time" name="booking_time" required class="form-control">
+                        <form id="boardingForm" action="process_boarding.php" method="POST">
+                            <div class="booking-section mb-4">
+                                <h5 class="mb-3"><i class="bi bi-calendar"></i> Periode Penitipan</h5>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="check_in_date" class="form-label">Tanggal Check-in</label>
+                                        <input type="date" class="form-control" id="check_in_date" name="check_in_date" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="check_out_date" class="form-label">Tanggal Check-out</label>
+                                        <input type="date" class="form-control" id="check_out_date" name="check_out_date" required>
+                                    </div>
+                                </div>
                             </div>
 
                             <div class="booking-section mb-4">
-                                <h5 class="mb-3"><i class="bi bi-person"></i> Data Pelanggan</h5>
+                                <h5 class="mb-3"><i class="bi bi-person"></i> Data Pemilik</h5>
                                 <div class="mb-3">
                                     <input type="text" class="form-control" name="owner_name" placeholder="Nama Pemilik" required>
                                 </div>
@@ -91,8 +73,11 @@ if (!isset($_SESSION['user_id'])) {
                             </div>
 
                             <div class="booking-section mb-4">
-                                <h5 class="mb-3"><i class="bi bi-heart"></i> Jenis Hewan</h5>
-                                <div class="d-flex gap-4">
+                                <h5 class="mb-3"><i class="bi bi-heart"></i> Data Hewan</h5>
+                                <div class="mb-3">
+                                    <input type="text" class="form-control" name="pet_name" placeholder="Nama Hewan" required>
+                                </div>
+                                <div class="d-flex gap-4 mb-3">
                                     <div class="form-check">
                                         <input type="radio" class="form-check-input" id="dog" name="pet_type" value="Anjing" required>
                                         <label class="form-check-label" for="dog">Anjing</label>
@@ -105,24 +90,20 @@ if (!isset($_SESSION['user_id'])) {
                             </div>
 
                             <div class="booking-section mb-4">
-                                <h5 class="mb-3"><i class="bi bi-tag"></i> Pilih Paket</h5>
+                                <h5 class="mb-3"><i class="bi bi-tag"></i> Paket Penitipan</h5>
                                 <div class="d-flex flex-wrap gap-2">
-                                    <button type="button" class="btn btn-outline-primary package-btn" onclick="selectPackage('Basic - 59k', this)">
+                                    <button type="button" class="btn btn-outline-primary package-btn" onclick="selectPackage('Regular - 50k', this)">
                                         <div class="package-content">
-                                            <div class="package-name">Basic</div>
-                                            <div class="package-price">Rp 59.000</div>
+                                            <div class="package-name">Regular</div>
+                                            <div class="package-price">Rp 50.000/hari</div>
+                                            <small>Kandang standar, makan 2x</small>
                                         </div>
                                     </button>
-                                    <button type="button" class="btn btn-outline-primary package-btn" onclick="selectPackage('Kutu - Jamur - 70k', this)">
+                                    <button type="button" class="btn btn-outline-primary package-btn" onclick="selectPackage('Premium - 75k', this)">
                                         <div class="package-content">
-                                            <div class="package-name">Kutu & Jamur</div>
-                                            <div class="package-price">Rp 70.000</div>
-                                        </div>
-                                    </button>
-                                    <button type="button" class="btn btn-outline-primary package-btn" onclick="selectPackage('Full - 86k', this)">
-                                        <div class="package-content">
-                                            <div class="package-name">Full Service</div>
-                                            <div class="package-price">Rp 86.000</div>
+                                            <div class="package-name">Premium</div>
+                                            <div class="package-price">Rp 75.000/hari</div>
+                                            <small>Kandang besar, makan 3x, grooming</small>
                                         </div>
                                     </button>
                                 </div>
@@ -130,7 +111,13 @@ if (!isset($_SESSION['user_id'])) {
                             </div>
 
                             <div class="booking-section mb-4">
-                                <h5 class="mb-3"><i class="bi bi-geo-alt"></i> Lokasi dan Pengantaran</h5>
+                                <h5 class="mb-3"><i class="bi bi-clipboard"></i> Catatan Khusus</h5>
+                                <textarea class="form-control" name="special_notes" rows="3" 
+                                    placeholder="Contoh: Jadwal makan, obat-obatan, atau kebiasaan khusus hewan"></textarea>
+                            </div>
+
+                            <div class="booking-section mb-4">
+                                <h5 class="mb-3"><i class="bi bi-geo-alt"></i> Pengantaran</h5>
                                 <div class="d-flex gap-4 mb-3">
                                     <div class="form-check">
                                         <input type="radio" class="form-check-input" id="datang_sendiri" name="delivery_method" value="datang_sendiri" checked onchange="toggleDeliveryOptions()">
@@ -141,34 +128,24 @@ if (!isset($_SESSION['user_id'])) {
                                         <label class="form-check-label" for="antar_jemput">Layanan Antar Jemput</label>
                                     </div>
                                 </div>
-                                <small class="text-muted mb-3 d-block">
-                                    <i class="bi bi-info-circle"></i> Layanan antar jemput tersedia untuk area: Sukaharja, Pinayungan, dan Puseurjaya
-                                </small>
 
                                 <div id="addressSection" style="display: none;">
                                     <div class="mb-3">
-                                        <label class="form-label">Kecamatan</label>
-                                        <select class="form-select" id="kecamatan" name="kecamatan" onchange="updateDesa()" required>
-                                            <option value="">Pilih Kecamatan</option>
-                                            <option value="Telukjambe Timur">Telukjambe Timur</option>
-                                        </select>
+                                        <input type="text" class="form-control" name="kecamatan" placeholder="Kecamatan">
                                     </div>
                                     <div class="mb-3">
-                                        <label class="form-label">Desa/Kelurahan</label>
-                                        <select class="form-select" id="desa" name="desa" required>
-                                            <option value="">Pilih Desa/Kelurahan</option>
-                                        </select>
+                                        <input type="text" class="form-control" name="desa" placeholder="Desa/Kelurahan">
                                     </div>
                                     <div class="mb-3">
-                                        <label class="form-label">Detail Alamat</label>
-                                        <textarea class="form-control" id="detail_alamat" name="detail_alamat" rows="3" placeholder="Masukkan detail alamat (nama jalan, nomor rumah, RT/RW)" required></textarea>
+                                        <textarea class="form-control" name="detail_alamat" rows="2" 
+                                            placeholder="Detail Alamat (Nama Jalan, RT/RW, No. Rumah)"></textarea>
                                     </div>
                                 </div>
                             </div>
 
                             <div class="text-center">
                                 <button type="submit" class="btn btn-primary btn-lg">
-                                    <i class="bi bi-check-circle"></i> Selesaikan Pemesanan
+                                    <i class="bi bi-check-circle"></i> Buat Reservasi Penitipan
                                 </button>
                             </div>
                         </form>
@@ -184,6 +161,6 @@ if (!isset($_SESSION['user_id'])) {
         </div>
     </footer>
 
-    <!-- Your existing scripts remain the same -->
+    <script src="js/boarding.js"></script>
 </body>
 </html>

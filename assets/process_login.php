@@ -1,29 +1,42 @@
 <?php
-header("Content-Type: application/json");
-require_once '../config/connection.php';
 session_start();
+require_once 'config.php';
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $email = $_POST["email"];
-    $password = $_POST["password"];
+header('Content-Type: application/json');
 
-    $stmt = $conn->prepare("SELECT * FROM users WHERE email = ?");
-    $stmt->bind_param("s", $email);
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    if (!isset($_POST['username']) || !isset($_POST['password'])) {
+        echo json_encode(['status' => 'error', 'message' => 'Missing credentials']);
+        exit();
+    }
+
+    $username = $_POST['username'];
+    $password = $_POST['password'];
+    $redirect = isset($_POST['redirect']) ? $_POST['redirect'] : 'index.php';
+
+    $sql = "SELECT * FROM users WHERE username = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("s", $username);
     $stmt->execute();
     $result = $stmt->get_result();
 
-    if ($result->num_rows > 0) {
-        $user = $result->fetch_assoc();
-        if (password_verify($password, $user['password'])) {
-            $_SESSION['user_id'] = $user['id'];
-            $_SESSION['username'] = $user['username'];
-            $_SESSION['email'] = $user['email'];
-            echo json_encode(["status" => "success", "message" => "Login successful!"]);
-        } else {
-            echo json_encode(["status" => "error", "message" => "Invalid password!"]);
-        }
-    } else {
-        echo json_encode(["status" => "error", "message" => "User not found!"]);
+    if ($result === false) {
+        echo json_encode(['status' => 'error', 'message' => 'Database error: ' . $conn->error]);
+        exit();
     }
+
+    if ($row = $result->fetch_assoc()) {
+        if (password_verify($password, $row['password'])) {
+            $_SESSION['user_id'] = $row['id'];
+            $_SESSION['username'] = $row['username'];
+            echo json_encode(['status' => 'success', 'redirect' => $redirect]);
+            exit();
+        }
+    }
+
+    echo json_encode(['status' => 'error', 'message' => 'Invalid username or password']);
+    exit();
 }
+
+echo json_encode(['status' => 'error', 'message' => 'Invalid request method']);
 ?>

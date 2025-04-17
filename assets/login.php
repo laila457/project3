@@ -1,6 +1,15 @@
+<?php
+session_start();
+if (isset($_SESSION['user_id'])) {
+    header("Location: index.php");
+    exit();
+}
+
+$redirect = isset($_GET['redirect']) ? $_GET['redirect'] : 'index.php';
+?>
 <!DOCTYPE html>
-<html lang="en">
-  <head>
+<html lang="id">
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Login & Register</title>
@@ -74,8 +83,8 @@
       </h3>
       <form onsubmit="handleLogin(event)">
         <div class="mb-3">
-        <label for="loginEmail" class="form-label">Email address</label>
-        <input type="email" class="form-control" id="loginEmail" placeholder="Enter your email" required>
+        <label for="loginUsername" class="form-label">Username</label>
+        <input type="text" class="form-control" id="loginUsername" placeholder="Enter your username" required>
         </div>
         <div class="mb-3">
         <label for="loginPassword" class="form-label">Password</label>
@@ -166,20 +175,22 @@
 
     function handleLogin(event) {
         event.preventDefault();
-        const email = document.getElementById('loginEmail').value;
+        const username = document.getElementById('loginUsername').value;
         const password = document.getElementById('loginPassword').value;
+        const urlParams = new URLSearchParams(window.location.search);
+        const redirect = urlParams.get('redirect') || 'index.php';
 
         fetch('process_login.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
             },
-            body: `email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`
+            body: `username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}&redirect=${encodeURIComponent(redirect)}`
         })
         .then(response => response.json())
         .then(data => {
             if (data.status === 'success') {
-                window.location.href = 'index.php';
+                window.location.href = data.redirect;
             } else {
                 alert(data.message);
             }
