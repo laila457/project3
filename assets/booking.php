@@ -138,11 +138,11 @@ if (!isset($_SESSION['user_id'])) {
                                     </div>
                                     <div class="form-check">
                                         <input type="radio" class="form-check-input" id="antar_jemput" name="delivery_method" value="antar_jemput" onchange="toggleDeliveryOptions()">
-                                        <label class="form-check-label" for="antar_jemput">Layanan Antar Jemput</label>
+                                        <label class="form-check-label" for="antar_jemput">Layanan Antar Jemput (Gratis)</label>
                                     </div>
                                 </div>
                                 <small class="text-muted mb-3 d-block">
-                                    <i class="bi bi-info-circle"></i> Layanan antar jemput tersedia untuk area: Sukaharja, Pinayungan, dan Puseurjaya
+                                    <i class="bi bi-info-circle"></i> Layanan antar jemput gratis tersedia untuk area: Sukaharja, Pinayungan, dan Puseurjaya
                                 </small>
 
                                 <div id="addressSection" style="display: none;">
@@ -184,6 +184,23 @@ if (!isset($_SESSION['user_id'])) {
         </div>
     </footer>
 
-    <!-- Your existing scripts remain the same -->
+    <script>
+    // Add this after your existing JavaScript
+    document.addEventListener('DOMContentLoaded', function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const rebookingId = urlParams.get('rebooking_id');
+        
+        if(rebookingId) {
+            fetch('get_booking_data.php?rebooking_id=' + rebookingId)
+                .then(response => response.json())
+                .then(data => {
+                    document.querySelector('input[name="owner_name"]').value = data.owner_name;
+                    document.querySelector('input[name="phone"]').value = data.phone;
+                    document.querySelector(`input[name="pet_type"][value="${data.pet_type}"]`).checked = true;
+                    selectPackage(data.package, document.querySelector(`button[onclick*="${data.package}"]`));
+                });
+        }
+    });
+    </script>
 </body>
 </html>

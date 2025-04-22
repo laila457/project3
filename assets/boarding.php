@@ -92,14 +92,14 @@ if (!isset($_SESSION['user_id'])) {
                             <div class="booking-section mb-4">
                                 <h5 class="mb-3"><i class="bi bi-tag"></i> Paket Penitipan</h5>
                                 <div class="d-flex flex-wrap gap-2">
-                                    <button type="button" class="btn btn-outline-primary package-btn" onclick="selectPackage('Regular - 50k', this)">
+                                    <button type="button" class="btn btn-outline-primary package-btn" onclick="selectPackage('Regular', this, 50000)">
                                         <div class="package-content">
                                             <div class="package-name">Regular</div>
                                             <div class="package-price">Rp 50.000/hari</div>
                                             <small>Kandang standar, makan 2x</small>
                                         </div>
                                     </button>
-                                    <button type="button" class="btn btn-outline-primary package-btn" onclick="selectPackage('Premium - 75k', this)">
+                                    <button type="button" class="btn btn-outline-primary package-btn" onclick="selectPackage('Premium', this, 75000)">
                                         <div class="package-content">
                                             <div class="package-name">Premium</div>
                                             <div class="package-price">Rp 75.000/hari</div>
@@ -108,6 +108,7 @@ if (!isset($_SESSION['user_id'])) {
                                     </button>
                                 </div>
                                 <input type="hidden" id="selected_package" name="package">
+                                <input type="hidden" id="package_price" name="package_price">
                             </div>
 
                             <div class="booking-section mb-4">
@@ -129,16 +130,27 @@ if (!isset($_SESSION['user_id'])) {
                                     </div>
                                 </div>
 
+                                <small class="text-muted mb-3 d-block">
+                                    <i class="bi bi-info-circle"></i> Layanan antar jemput gratis tersedia untuk area: Sukaharja, Pinayungan, dan Puseurjaya
+                                </small>
+
                                 <div id="addressSection" style="display: none;">
                                     <div class="mb-3">
-                                        <input type="text" class="form-control" name="kecamatan" placeholder="Kecamatan">
+                                        <label class="form-label">Kecamatan</label>
+                                        <select class="form-select" id="kecamatan" name="kecamatan" onchange="updateDesa()" required>
+                                            <option value="">Pilih Kecamatan</option>
+                                            <option value="Telukjambe Timur">Telukjambe Timur</option>
+                                        </select>
                                     </div>
                                     <div class="mb-3">
-                                        <input type="text" class="form-control" name="desa" placeholder="Desa/Kelurahan">
+                                        <label class="form-label">Desa/Kelurahan</label>
+                                        <select class="form-select" id="desa" name="desa" required>
+                                            <option value="">Pilih Desa/Kelurahan</option>
+                                        </select>
                                     </div>
                                     <div class="mb-3">
-                                        <textarea class="form-control" name="detail_alamat" rows="2" 
-                                            placeholder="Detail Alamat (Nama Jalan, RT/RW, No. Rumah)"></textarea>
+                                        <label class="form-label">Detail Alamat</label>
+                                        <textarea class="form-control" id="detail_alamat" name="detail_alamat" rows="3" placeholder="Masukkan detail alamat (nama jalan, nomor rumah, RT/RW)" required></textarea>
                                     </div>
                                 </div>
                             </div>
@@ -161,6 +173,60 @@ if (!isset($_SESSION['user_id'])) {
         </div>
     </footer>
 
-    <script src="js/boarding.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const rebookingId = urlParams.get('rebooking_id');
+        
+        if(rebookingId) {
+            fetch('get_boarding_data.php?rebooking_id=' + rebookingId)
+                .then(response => response.json())
+                .then(data => {
+                    document.querySelector('input[name="owner_name"]').value = data.owner_name;
+                    document.querySelector('input[name="phone"]').value = data.phone;
+                    document.querySelector('input[name="pet_name"]').value = data.pet_name;
+                    document.querySelector(`input[name="pet_type"][value="${data.pet_type}"]`).checked = true;
+                    document.querySelector('textarea[name="special_notes"]').value = data.special_notes;
+                    selectPackage(data.package, document.querySelector(`button[onclick*="${data.package}"]`));
+                });
+        }
+    });
+    
+    function selectPackage(packageName, element, price) {
+        // Remove active class from all package buttons
+        document.querySelectorAll('.package-btn').forEach(btn => {
+            btn.classList.remove('active', 'btn-primary');
+            btn.classList.add('btn-outline-primary');
+        });
+        
+        // Add active class to selected button
+        element.classList.remove('btn-outline-primary');
+        element.classList.add('active', 'btn-primary');
+        
+        // Update hidden inputs
+        document.getElementById('selected_package').value = packageName;
+        document.getElementById('package_price').value = price;
+        
+        // Calculate total price if dates are selected
+        calculateTotalPrice();
+    }
+
+    function calculateTotalPrice() {
+        const checkIn = new Date(document.getElementById('check_in_date').value);
+        const checkOut = new Date(document.getElementById('check_out_date').value);
+        const pricePerDay = parseInt(document.getElementById('package_price').value) || 0;
+        
+        if (checkIn && checkOut && pricePerDay) {
+            const days = Math.ceil((checkOut - checkIn) / (1000 * 60 * 60 * 24));
+            const total = days * pricePerDay;
+            // You can add a total display element if needed
+            console.log(`Total price: Rp ${total.toLocaleString()}`);
+        }
+    }
+
+    // Add event listeners for date changes
+    document.getElementById('check_in_date').addEventListener('change', calculateTotalPrice);
+    document.getElementById('check_out_date').addEventListener('change', calculateTotalPrice);
+    </script>
 </body>
 </html>

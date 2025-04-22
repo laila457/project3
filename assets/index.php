@@ -5,16 +5,15 @@ require_once '../config/connection.php';
 // Get booking history only for logged-in user
 $query = "SELECT b.*, 
           CASE 
-            WHEN p.id IS NOT NULL THEN 'Sudah Dibayar'
+            WHEN b.payment_status = 'paid' OR (b.payment_proof IS NOT NULL AND b.payment_proof != '') THEN 'Sudah Dibayar'
             ELSE 'Belum Dibayar'
           END as payment_status
           FROM bookings b 
-          LEFT JOIN payments p ON b.id = p.booking_id 
           WHERE b.owner_name = ?
           ORDER BY b.booking_date DESC";
 
 $stmt = $conn->prepare($query);
-$stmt->bind_param("s", $_SESSION['username']); // Changed to use username
+$stmt->bind_param("s", $_SESSION['username']); // Using username instead of user_id
 $stmt->execute();
 $result = $stmt->get_result();
 
@@ -139,7 +138,7 @@ $result = $stmt->get_result();
                                         <i class="bi bi-credit-card"></i> Bayar
                                     </a>
                                 <?php else: ?>
-                                    <a href="booking.php" class="btn btn-outline-primary btn-sm">
+                                    <a href="booking.php?rebooking_id=<?= $booking['id'] ?>" class="btn btn-outline-primary btn-sm">
                                         <i class="bi bi-plus-circle"></i> Pesan Lagi
                                     </a>
                                 <?php endif; ?>

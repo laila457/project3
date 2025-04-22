@@ -20,17 +20,16 @@ if (!$booking) {
     exit();
 }
 
-// Calculate total payment
+// Calculate total payment - remove delivery cost
 $base_price = str_replace(['Basic - ', 'Kutu - Jamur - ', 'Full - ', 'k'], '', $booking['package']);
-$delivery_cost = ($booking['delivery_method'] === 'antar_jemput') ? 20 : 0;
-$total_price = ($base_price + $delivery_cost) * 1000;
+$total_price = $base_price * 1000;
 
 // Update the total price in database
 $update_stmt = $conn->prepare("UPDATE bookings SET total_payment = ? WHERE id = ?");
 $update_stmt->bind_param("di", $total_price, $booking_id);
 $update_stmt->execute();
+// Update the form to include file upload
 ?>
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -64,26 +63,23 @@ $update_stmt->execute();
             <div class="col-md-8">
                 <div class="card border-0 shadow-sm">
                     <div class="card-body p-5">
-                        <h2 class="text-center mb-4">Pembayaran Otomatis</h2>
+                        <h2 class="text-center mb-4">Pembayaran</h2>
                         
                         <div class="booking-details mb-4">
                             <h5>Detail Pesanan:</h5>
                             <p><strong>Paket:</strong> <?php echo htmlspecialchars($booking['package']); ?></p>
                             <p><strong>Tanggal:</strong> <?php echo htmlspecialchars($booking['booking_date']); ?></p>
                             <p><strong>Waktu:</strong> <?php echo htmlspecialchars($booking['booking_time']); ?></p>
-                            <?php if ($booking['delivery_method'] === 'antar_jemput'): ?>
-                                <p><strong>Biaya Antar Jemput:</strong> Rp 20.000</p>
-                            <?php endif; ?>
                             <p><strong>Total Pembayaran:</strong> Rp <?php echo number_format($total_price, 0, ',', '.'); ?></p>
                         </div>
 
                         <div class="payment-methods">
-                            <h5 class="mb-3">Pilih Metode Pembayaran:</h5>
-                            <form id="paymentForm" action="process_payment.php" method="POST">
+                            <form id="paymentForm" action="process_payment.php" method="POST" enctype="multipart/form-data">
                                 <input type="hidden" name="booking_id" value="<?php echo $booking_id; ?>">
                                 <input type="hidden" name="total_amount" value="<?php echo $total_price; ?>">
                                 
-                                <div class="mb-3">
+                                <div class="mb-4">
+                                    <h5 class="mb-3">Pilih Metode Pembayaran:</h5>
                                     <select class="form-select" name="payment_method" id="paymentMethod" onchange="showPaymentDetails(this.value)" required>
                                         <option value="">Pilih metode pembayaran</option>
                                         <option value="QRIS">QRIS</option>
@@ -106,16 +102,18 @@ $update_stmt->execute();
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="alert alert-warning">
-                                        <h6>Langkah Pembayaran:</h6>
-                                        <ol id="paymentInstructions" class="mb-0"></ol>
-                                    </div>
-                                </div>
 
-                                <div class="text-center mt-4">
-                                    <button type="submit" class="btn btn-primary btn-lg">
-                                        <i class="bi bi-credit-card"></i> Konfirmasi Pembayaran
-                                    </button>
+                                    <div class="mb-4">
+                                        <h5>Upload Bukti Pembayaran</h5>
+                                        <input type="file" class="form-control" name="payment_proof" accept="image/*" required>
+                                        <small class="text-muted">Format: JPG, PNG, atau JPEG (Max 2MB)</small>
+                                    </div>
+
+                                    <div class="text-center">
+                                        <button type="submit" class="btn btn-primary btn-lg">
+                                            Konfirmasi Pembayaran
+                                        </button>
+                                    </div>
                                 </div>
                             </form>
                         </div>
@@ -125,51 +123,34 @@ $update_stmt->execute();
         </div>
     </div>
 
-    <footer class="mt-5">
-        <div class="container">
-            <p class="m-0">&copy; 2025 HappyPaws Indo. All Rights Reserved.</p>
-        </div>
-    </footer>
-
     <script>
     function showPaymentDetails(method) {
         const detailsDiv = document.getElementById('paymentDetails');
         const qrisDiv = document.getElementById('qrisCode');
         const bankDiv = document.getElementById('bankDetails');
-        const instructionsDiv = document.getElementById('paymentInstructions');
         const bankName = bankDiv.querySelector('.bank-name');
         const accountNumber = bankDiv.querySelector('.account-number');
         
-        detailsDiv.style.display = 'block';
-        
-        if (method === 'QRIS') {
-            qrisDiv.style.display = 'block';
-            bankDiv.style.display = 'none';
-            instructionsDiv.innerHTML = `
-                <li>Scan QRIS code menggunakan aplikasi e-wallet Anda</li>
-                <li>Masukkan nominal pembayaran: Rp ${new Intl.NumberFormat('id-ID').format(<?php echo $total_price; ?>)}</li>
-                <li>Periksa kembali detail pembayaran</li>
-                <li>Selesaikan pembayaran</li>
-                <li>Simpan bukti pembayaran</li>
-            `;
-        } else {
-            qrisDiv.style.display = 'none';
-            bankDiv.style.display = 'block';
+        if (method) {
+            detailsDiv.style.display = 'block';
             
-            if (method === 'BCA') {
-                bankName.textContent = 'Bank BCA';
-                accountNumber.textContent = 'No. Rekening: 1234567890';
-            } else if (method === 'Mandiri') {
-                bankName.textContent = 'Bank Mandiri';
-                accountNumber.textContent = 'No. Rekening: 0987654321';
+            if (method === 'QRIS') {
+                qrisDiv.style.display = 'block';
+                bankDiv.style.display = 'none';
+            } else {
+                qrisDiv.style.display = 'none';
+                bankDiv.style.display = 'block';
+                
+                if (method === 'BCA') {
+                    bankName.textContent = 'Bank BCA';
+                    accountNumber.textContent = 'No. Rekening: 1234567890';
+                } else if (method === 'Mandiri') {
+                    bankName.textContent = 'Bank Mandiri';
+                    accountNumber.textContent = 'No. Rekening: 0987654321';
+                }
             }
-            
-            instructionsDiv.innerHTML = `
-                <li>Transfer ke rekening yang tertera di atas</li>
-                <li>Masukkan nominal: Rp ${new Intl.NumberFormat('id-ID').format(<?php echo $total_price; ?>)}</li>
-                <li>Pastikan nama penerima adalah Happy Paws</li>
-                <li>Simpan bukti transfer</li>
-            `;
+        } else {
+            detailsDiv.style.display = 'none';
         }
     }
     </script>

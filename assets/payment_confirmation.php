@@ -90,13 +90,26 @@ if (!$booking) {
                             <h5>Langkah Selanjutnya:</h5>
                             <ol class="list-group list-group-numbered mb-4">
                                 <li class="list-group-item">Transfer sesuai nominal yang tertera</li>
-                                <li class="list-group-item">Simpan bukti pembayaran</li>
-                                <li class="list-group-item">Kirim bukti pembayaran ke WhatsApp 081234567890</li>
+                                <li class="list-group-item">Upload bukti pembayaran menggunakan form di bawah ini</li>
                             </ol>
                         </div>
 
+                        <div class="upload-section mb-4">
+                            <form action="process_payment.php" method="POST" enctype="multipart/form-data">
+                                <input type="hidden" name="booking_id" value="<?php echo $booking_id; ?>">
+                                <div class="mb-3">
+                                    <label for="payment_proof" class="form-label">Upload Bukti Pembayaran</label>
+                                    <input type="file" class="form-control" id="payment_proof" name="payment_proof" accept="image/*" required>
+                                    <div class="form-text">Format yang diterima: JPG, PNG, JPEG. Maksimal ukuran: 2MB</div>
+                                </div>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-upload"></i> Upload Bukti Pembayaran
+                                </button>
+                            </form>
+                        </div>
+
                         <div class="text-center">
-                            <a href="index.php" class="btn btn-primary">
+                            <a href="index.php" class="btn btn-secondary">
                                 <i class="bi bi-house-door"></i> Kembali ke Beranda
                             </a>
                         </div>
