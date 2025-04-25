@@ -133,15 +133,20 @@ $result = $stmt->get_result();
                                 <span class="badge bg-<?= $booking['payment_status'] == 'Sudah Dibayar' ? 'success' : 'warning' ?>">
                                     <?= $booking['payment_status']; ?>
                                 </span>
-                                <?php if($booking['payment_status'] == 'Belum Dibayar'): ?>
-                                    <a href="payment.php?booking_id=<?= $booking['id'] ?>" class="btn btn-primary btn-sm">
-                                        <i class="bi bi-credit-card"></i> Bayar
-                                    </a>
-                                <?php else: ?>
-                                    <a href="booking.php?rebooking_id=<?= $booking['id'] ?>" class="btn btn-outline-primary btn-sm">
-                                        <i class="bi bi-plus-circle"></i> Pesan Lagi
-                                    </a>
-                                <?php endif; ?>
+                                <div>
+                                    <?php if($booking['payment_status'] == 'Belum Dibayar'): ?>
+                                        <a href="payment.php?booking_id=<?= $booking['id'] ?>" class="btn btn-primary btn-sm">
+                                            <i class="bi bi-credit-card"></i> Bayar
+                                        </a>
+                                    <?php else: ?>
+                                        <a href="struk.php?booking_id=<?= $booking['id'] ?>" class="btn btn-info btn-sm me-2">
+                                            <i class="bi bi-receipt"></i> Lihat Struk
+                                        </a>
+                                        <a href="booking.php?rebooking_id=<?= $booking['id'] ?>" class="btn btn-outline-primary btn-sm">
+                                            <i class="bi bi-plus-circle"></i> Pesan Lagi
+                                        </a>
+                                    <?php endif; ?>
+                                </div>
                             </div>
                         </div>
                     </div>
